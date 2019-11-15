@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Jiang Xueqiang" />
+  
+  
+  <title>CSAPP_datalab | Blog of jxq96</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Bit-Operation," />
+  
+
+  
+  <meta name="description" content="Blog of JiangXueq">
+
+  
+
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js" async></script>
+  
+
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  
+
+  
+    <script src="//unpkg.com/valine/dist/Valine.min.js" async></script>
+  
+
+  
+
+  <script>
+  // theme-ad's config script
+  // it can be used in every script
+  
+  window.AD_CONFIG = {
+    leancloud: {"appid":"QYEL9vtvUpkolt2sURisf6BE-gzGzoHsz","appkey":"46n8F2VkrYQHiS7td97E57CO","comment":true,"count":true},
+    welcome: {"enable":false,"interval":30},
+    start_time: "2019-11-12",
+    passwords: ["57968A7E17D728C1848AE73510CD80D8CF65D91DCB387517803DC2817271230C", ],
+    is_post: true,
+    lock: false,
+    author: "Jiang Xueqiang",
+    share: {"twitter":true,"facebook":true,"weibo":true,"qq":true,"wechat":true},
+    mathjax: true,
+    page_type: "",
+    root: "/"
+  };
+</script>
+
+  <script src="/vendor/sha256.min.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/index.js"></script>
+<script src="/vendor/qrcode.min.js"></script>
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/styles/components/highlight/highlight.css">
+
+  
+</head>
+  <body>
+    <header class="site-header">
+  <div class="site-header-brand">
+    
+      <span class="site-header-brand-title">
+        <a href="/">JXQ96</a>
+      </span>
+    
+    
+      <span class="site-header-brand-motto"> | To Learn, To Write</span>
+    
+  </div>
+  <div class="site-header-right">
+    <nav class="site-header-navigation">
+      
+        <a href="/" target="_self">首页</a>
+      
+        <a href="/archives/" target="_self">归档</a>
+      
+        <a href="/tags/" target="_self">标签</a>
+      
+        <a href="/categories/" target="_self">分类</a>
+      
+        <a href="/friends/" target="_self">友链</a>
+      
+        <a href="/about/" target="_self">关于</a>
+      
+    </nav>
+    <div class="site-header-btn">
+      
+        <a href="https://github.com/jxq96/" target="_blank" id="site-github">
+          <i class="fa fa-github-alt"></i>
+        </a>
+      
+      <!-- <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-search">
+        <i class="fa fa-search"></i>
+      </a>
+      <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-nav-btn">
+        <i class="fa fa-ellipsis-v"></i> -->
+      </a>
+    </div>
+  </div>
+</header>
+<nav class="table-content" id="site-nav">
+  <div class="table-content-title">
+    <span>导航</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc">
+      
+        <li class="toc-item">
+          <a href="/" target="_self">
+            首页
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/archives/" target="_self">
+            归档
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/tags/" target="_self">
+            标签
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/categories/" target="_self">
+            分类
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/friends/" target="_self">
+            友链
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/about/" target="_self">
+            关于
+          </a>
+        </li>
+      
+    </ol>
+  </div>
+</nav>
+<div id="site-process"></div>
+    <main>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2019-11-15
+    </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    CSAPP_datalab
+  </h1>
+  
+  <article class="passage-article">
+    <h2 id="实验内容"><a href="#实验内容" class="headerlink" title="实验内容"></a>实验内容</h2><h3 id="puzzle1-bitAnd-用～和-实现-amp"><a href="#puzzle1-bitAnd-用～和-实现-amp" class="headerlink" title="puzzle1 bitAnd 用～和|实现&amp;"></a>puzzle1 bitAnd 用～和|实现&amp;</h3><p>这个函数很容易实现，直接利用布尔代数里面的德摩根法则即可</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * bitAnd - x&amp;y using only ~ and |</span></span><br><span class="line"><span class="comment"> *   Example: bitAnd(6, 5) = 4</span></span><br><span class="line"><span class="comment"> *   Legal ops: ~ |</span></span><br><span class="line"><span class="comment"> *   Max ops: 8</span></span><br><span class="line"><span class="comment"> *   Rating: 1</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">///bitAnd</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bitAnd</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">return</span> ~(~x|~y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle2-getByte-返回int中指定的一个字节"><a href="#puzzle2-getByte-返回int中指定的一个字节" class="headerlink" title="puzzle2 getByte 返回int中指定的一个字节"></a>puzzle2 getByte 返回int中指定的一个字节</h3><p>看到这个问题的第一个想法就是需要利用掩码把需要的字节“提取”出来，但是不能利用条件判断，最后想到n的取值为0～3，直接把需要的字节根据n来确定右移多少位，把需要的字节移到最右边，然后掩码0xFF“提取”字节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * getByte - Extract byte n from word x</span></span><br><span class="line"><span class="comment"> *   Bytes numbered from 0 (LSB) to 3 (MSB)</span></span><br><span class="line"><span class="comment"> *   Examples: getByte(0x12345678,1) = 0x56</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 6</span></span><br><span class="line"><span class="comment"> *   Rating: 2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">//getByte</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getByte</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> s = n&lt;&lt;<span class="number">3</span>; <span class="comment">//相当于n*8，分别得到 0，8，16，24</span></span><br><span class="line">  x = x &gt;&gt; s;  <span class="comment">//把对应的字节移到最右边</span></span><br><span class="line">  <span class="keyword">return</span> x&amp;<span class="number">0xFF</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle3-logicalShift-实现int的逻辑右移"><a href="#puzzle3-logicalShift-实现int的逻辑右移" class="headerlink" title="puzzle3 logicalShift 实现int的逻辑右移"></a>puzzle3 logicalShift 实现int的逻辑右移</h3><p>由int的算数右移实现逻辑右移，只需要把右边补出的符号位清空，用掩码清空，例如右移n位，则选取掩码高n位为0，其他位为1来清空即可，但当n为0时有点特殊,因为n为0时左移32-0位会溢出，所以采取了一个小技巧，先左移31位再右移n位再左移1位而不是直接左移32-n位来获得掩码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * logicalShift - shift x to the right by n, using a logical shift</span></span><br><span class="line"><span class="comment"> *   Can assume that 0 &lt;= n &lt;= 31</span></span><br><span class="line"><span class="comment"> *   Examples: logicalShift(0x87654321,4) = 0x08765432</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 20</span></span><br><span class="line"><span class="comment"> *   Rating: 3</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">logicalShift</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> mask = ~((((~<span class="number">0</span>) &lt;&lt; <span class="number">31</span>) &gt;&gt; n) &lt;&lt; <span class="number">1</span>); <span class="comment">//～0 = 0xFFFFFFFF</span></span><br><span class="line">  <span class="keyword">return</span> (x &gt;&gt; n)&amp;mask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle4-bitCount-计算int位串中1的个数"><a href="#puzzle4-bitCount-计算int位串中1的个数" class="headerlink" title="puzzle4 bitCount 计算int位串中1的个数"></a>puzzle4 bitCount 计算int位串中1的个数</h3><p>这道题是最难的一题，第一次遇到是在去年的暑假，当时花了好几个小时帮其他大学的同学解答了出来，想法是把一个32位的int分组数出来再合并，采取把32位分组为8组，每组4位</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * bitCount - returns count of number of 1's in word</span></span><br><span class="line"><span class="comment"> *   Examples: bitCount(5) = 2, bitCount(7) = 3</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 40</span></span><br><span class="line"><span class="comment"> *   Rating: 4</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bitCount</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> mask1 = (<span class="number">0x11</span>) | (<span class="number">0x11</span> &lt;&lt; <span class="number">8</span>); <span class="comment">//mask0 = 0001 0001 0001 0001(高16位为0)</span></span><br><span class="line">  <span class="keyword">int</span> mask = (mask1&lt;&lt;<span class="number">16</span>) | mask1;   <span class="comment">// mask = 0001 0001 0001 0001 0001 0001 0001 0001</span></span><br><span class="line">  <span class="keyword">int</span> count = x &amp; mask;</span><br><span class="line">  count = count + ((x &gt;&gt; <span class="number">1</span>) &amp; mask);</span><br><span class="line">  count = count + ((x &gt;&gt; <span class="number">2</span>) &amp; mask);</span><br><span class="line">  count = count + ((x &gt;&gt; <span class="number">3</span>) &amp; mask); <span class="comment">//现在count的每4位记录的是所在的4位的1的个数</span></span><br><span class="line">  <span class="comment">//下面把分别数出来的合起来</span></span><br><span class="line">  count = count + (count &gt;&gt; <span class="number">16</span>);</span><br><span class="line">  mask = <span class="number">0xF</span> | (<span class="number">0xF</span> &lt;&lt; <span class="number">8</span>); <span class="comment">//mask = 00001111 00001111(高16位为0)；</span></span><br><span class="line">  count = (count &amp; mask) + ((count &gt;&gt; <span class="number">4</span>) &amp; mask);  </span><br><span class="line">  count = count + (count &gt;&gt; <span class="number">8</span>);</span><br><span class="line">  count = count &amp; <span class="number">0x3F</span>;</span><br><span class="line">  <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle5-bang-不用！实现！的功能"><a href="#puzzle5-bang-不用！实现！的功能" class="headerlink" title="puzzle5 bang 不用！实现！的功能"></a>puzzle5 bang 不用！实现！的功能</h3><p>想到补码表示的+0与-0的编码表示相等，而非0的相反数都不相等，利用这个性质解决这个问题很容易，因为当x不为0时x和-x至少有一个的符号位为1，但是+0和-0的符号位都是0</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * bang - Compute !x without using !</span></span><br><span class="line"><span class="comment"> *   Examples: bang(3) = 0, bang(0) = 1</span></span><br><span class="line"><span class="comment"> *   Legal ops: ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 12</span></span><br><span class="line"><span class="comment"> *   Rating: 4</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bang</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> minusx = ~x + <span class="number">1</span> ;</span><br><span class="line">  <span class="keyword">int</span> result = (~(minusx|x)&gt;&gt;<span class="number">31</span>)&amp;<span class="number">1</span>; <span class="comment">//最后与1想与是为了清除其他位</span></span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle6-tmin-返回补码表示的最小整数"><a href="#puzzle6-tmin-返回补码表示的最小整数" class="headerlink" title="puzzle6 tmin 返回补码表示的最小整数"></a>puzzle6 tmin 返回补码表示的最小整数</h3><p>这道题很基本，只要知道补码是怎么回事即可，二进制补码表示的最小的数是最高位为1，其他位都是0</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * tmin - return minimum two's complement integer</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 4</span></span><br><span class="line"><span class="comment"> *   Rating: 1</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">tmin</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span> &lt;&lt; <span class="number">31</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle7-fitsBits-判断x是否能用n位表示"><a href="#puzzle7-fitsBits-判断x是否能用n位表示" class="headerlink" title="puzzle7 fitsBits 判断x是否能用n位表示"></a>puzzle7 fitsBits 判断x是否能用n位表示</h3><p>看到这道题的首先思路是把n位能用二进制补码表示出的最大整数和最小整数，然后再进行判断，但是做了很大一会没做出来，后来找到了一种很巧妙的算法，先把x左移位补满32位，在右移回n位，如果不能用n位表示，则左移时已经溢出，再右移回来也与开始的值不同了，这时候只需要判断其与开始的x是否相等即可，用异或判断是否相等</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * fitsBits - return 1 if x can be represented as an</span></span><br><span class="line"><span class="comment"> *  n-bit, two's complement integer.</span></span><br><span class="line"><span class="comment"> *   1 &lt;= n &lt;= 32</span></span><br><span class="line"><span class="comment"> *   Examples: fitsBits(5,3) = 0, fitsBits(-4,3) = 1</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 15</span></span><br><span class="line"><span class="comment"> *   Rating: 2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fitsBits</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> shift = <span class="number">33</span> + ~n ; <span class="comment">//32 - n;</span></span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">move</span> = (x &lt;&lt; shift) &gt;&gt; shift;</span><br><span class="line">  <span class="keyword">return</span> !(x^<span class="built_in">move</span>);  <span class="comment">//x与move相等返回1否则返回0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle8-divpwr2-计算-x-2-n-向0取整"><a href="#puzzle8-divpwr2-计算-x-2-n-向0取整" class="headerlink" title="puzzle8 divpwr2 计算 x/(2^n) 向0取整"></a>puzzle8 divpwr2 计算 x/(2^n) 向0取整</h3><p>显然当x为正数的时候直接把x右移n位即可，因为右移是向下取整，所以当x为负数时如果直接右移也是向下取整而不是向0取整，所以当x&lt;0时要给x加上2^n-1的偏置再右移</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * divpwr2 - Compute x/(2^n), for 0 &lt;= n &lt;= 30</span></span><br><span class="line"><span class="comment"> *  Round toward zero</span></span><br><span class="line"><span class="comment"> *   Examples: divpwr2(15,1) = 7, divpwr2(-33,4) = -2</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 15</span></span><br><span class="line"><span class="comment"> *   Rating: 2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">divpwr2</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> mask = ~(~<span class="number">0</span> &lt;&lt; n);</span><br><span class="line">    <span class="keyword">int</span> y = (x &gt;&gt; <span class="number">31</span>) &amp; mask;  <span class="comment">//当x&gt;=0时y=0，x&lt;0时 y = mask = 2^n-1</span></span><br><span class="line">    <span class="keyword">return</span> (x + y) &gt;&gt; n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle9-negate-返回一个int的相反数"><a href="#puzzle9-negate-返回一个int的相反数" class="headerlink" title="puzzle9 negate 返回一个int的相反数"></a>puzzle9 negate 返回一个int的相反数</h3><p>这个很容易，利用二进制补码的性质即可</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * negate - return -x</span></span><br><span class="line"><span class="comment"> *   Example: negate(1) = -1.</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 5</span></span><br><span class="line"><span class="comment"> *   Rating: 2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">negate</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> ~x + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle10-isPositive-判断一个int型变量是否为正数"><a href="#puzzle10-isPositive-判断一个int型变量是否为正数" class="headerlink" title="puzzle10 isPositive 判断一个int型变量是否为正数"></a>puzzle10 isPositive 判断一个int型变量是否为正数</h3><p>转换思路，如果只是判断是否为非负数，则很简单，直接根据符号位来判断，但是这样不能区分0和正数，但是我们可以根据符号位来直接确定负数，所以开始想到的办法是先把x变为其相反数，判断其相反数是否为负数即可，但是测试结果不通过，原来x取反再加一不一定变为其相反数，因为可能溢出，测试例中给的0x80000000取反加1后变为-1，显然是溢出了,所以后来放弃了这种做法，直接进行判断，只不过再加上x是否为0的掩码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * isPositive - return 1 if x &gt; 0, return 0 otherwise</span></span><br><span class="line"><span class="comment"> *   Example: isPositive(-1) = 0.</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 8</span></span><br><span class="line"><span class="comment"> *   Rating: 3</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">isPositive</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> mask = <span class="number">1</span> &lt;&lt; <span class="number">31</span>;</span><br><span class="line">  <span class="keyword">int</span> MST = (mask &amp; x); <span class="comment">//MST = 0x80000000 if x &lt; 0,MST = 0 if x&gt;=0</span></span><br><span class="line">  <span class="keyword">int</span> iszero = !(<span class="number">0</span>^x); <span class="comment">//iszero = 1 if x = 0 else iszero = 0  </span></span><br><span class="line">  <span class="keyword">return</span> (!MST) &amp; (!iszero);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意iszero的两次！并不是没用的，设想一下如果x是一个正数，这样iszero是一个非0的数但并不能保证是1，直接与MST相与得到的也就不能保证是1，只能保证是一个非0的数，但是一个非0的数两次取非之后一定是1</p>
+<h3 id="puzzle11-isLessOrEqual-判断x是否-lt-y-是则返回1-否则返回0"><a href="#puzzle11-isLessOrEqual-判断x是否-lt-y-是则返回1-否则返回0" class="headerlink" title="puzzle11 isLessOrEqual 判断x是否&lt;=y 是则返回1 否则返回0"></a>puzzle11 isLessOrEqual 判断x是否&lt;=y 是则返回1 否则返回0</h3><p>看到这个问题的第一个想法是先做减法，然后再用上一个puzzle isPositive的方法判断差的正负号，但是测试结果却是错的，从测试案例可以看出来错在相减时溢出了</p>
+<p><img src="/images/CSAPPreport_1.png" alt="screenshot"></p>
+<p>问题出在减法的溢出，显然只有两个符号不同的int相减才会溢出，所以修改算法，额外判断两个数是否相等</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * isLessOrEqual - if x &lt;= y  then return 1, else return 0</span></span><br><span class="line"><span class="comment"> *   Example: isLessOrEqual(4,5) = 1.</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 24</span></span><br><span class="line"><span class="comment"> *   Rating: 3</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">isLessOrEqual</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> x_neg = x &gt;&gt; <span class="number">31</span>;</span><br><span class="line">  <span class="keyword">int</span> y_neg = y &gt;&gt; <span class="number">31</span>;</span><br><span class="line">  <span class="keyword">return</span> !(((!x_neg) &amp; y_neg) | ((!(x_neg ^ y_neg)) &amp; (y+~x+<span class="number">1</span>)&gt;&gt;<span class="number">31</span>));</span><br><span class="line">   <span class="comment">//!((x&gt;=0&amp;&amp;y&lt;0)||(x与y同号且y-x&lt;0)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle12-ilog（2）返回以2为底的对数"><a href="#puzzle12-ilog（2）返回以2为底的对数" class="headerlink" title="puzzle12 ilog（2）返回以2为底的对数"></a>puzzle12 ilog（2）返回以2为底的对数</h3><p>直观上想，这道题就是要返回最高的1所在的位数，例如8的最高的1所在的位在第3位（从最低位0开始数）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * ilog2 - return floor(log base 2 of x), where x &gt; 0</span></span><br><span class="line"><span class="comment"> *   Example: ilog2(16) = 4</span></span><br><span class="line"><span class="comment"> *   Legal ops: ! ~ &amp; ^ | + &lt;&lt; &gt;&gt;</span></span><br><span class="line"><span class="comment"> *   Max ops: 90</span></span><br><span class="line"><span class="comment"> *   Rating: 4</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ilog2</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> bitsNumber=<span class="number">0</span>;</span><br><span class="line">  bitsNumber=(!!(x&gt;&gt;<span class="number">16</span>))&lt;&lt;<span class="number">4</span>;</span><br><span class="line">  bitsNumber=bitsNumber+((!!(x&gt;&gt;(bitsNumber+<span class="number">8</span>)))&lt;&lt;<span class="number">3</span>);</span><br><span class="line">  bitsNumber=bitsNumber+((!!(x&gt;&gt;(bitsNumber+<span class="number">4</span>)))&lt;&lt;<span class="number">2</span>);</span><br><span class="line">  bitsNumber=bitsNumber+((!!(x&gt;&gt;(bitsNumber+<span class="number">2</span>)))&lt;&lt;<span class="number">1</span>);</span><br><span class="line">  bitsNumber=bitsNumber+(!!(x&gt;&gt;(bitsNumber+<span class="number">1</span>)));</span><br><span class="line">  bitsNumber=bitsNumber+(!!bitsNumber)+(~<span class="number">0</span>)+(!(<span class="number">1</span>^x));</span><br><span class="line">  <span class="keyword">return</span> bitsNumber;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle13-float-neg-返回浮点数的相反数"><a href="#puzzle13-float-neg-返回浮点数的相反数" class="headerlink" title="puzzle13 float_neg 返回浮点数的相反数"></a>puzzle13 float_neg 返回浮点数的相反数</h3><p>根据单精度浮点数的编码，规格化的浮点数以及24-31全为0的非规格数以及表述无穷的非规格数都可以直接把符号位取反来返回其相反数，但是题目要求NaN要返回参数，所以加上一个判断是否为NaN，浮点的puzzle可以用if</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * float_neg - Return bit-level equivalent of expression -f for</span></span><br><span class="line"><span class="comment"> *   floating point argument f.</span></span><br><span class="line"><span class="comment"> *   Both the argument and result are passed as unsigned int's, but</span></span><br><span class="line"><span class="comment"> *   they are to be interpreted as the bit-level representations of</span></span><br><span class="line"><span class="comment"> *   single-precision floating point values.</span></span><br><span class="line"><span class="comment"> *   When argument is NaN, return argument.</span></span><br><span class="line"><span class="comment"> *   Legal ops: Any integer/unsigned operations incl. ||, &amp;&amp;. also if, while</span></span><br><span class="line"><span class="comment"> *   Max ops: 10</span></span><br><span class="line"><span class="comment"> *   Rating: 2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="title">float_neg</span><span class="params">(<span class="keyword">unsigned</span> uf)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> a = uf;</span><br><span class="line">  <span class="keyword">if</span>((!(((a&lt;&lt;<span class="number">1</span>)&gt;&gt;<span class="number">24</span>)+<span class="number">1</span>))&amp;&amp;(a&lt;&lt;<span class="number">9</span>))&#123;</span><br><span class="line">    <span class="keyword">return</span> uf; <span class="comment">//NaN</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="number">1</span>&lt;&lt;<span class="number">31</span>)^uf;</span><br><span class="line">  &#125;</span><br><span class="line"> <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle14-float-i2f-返回-float-x"><a href="#puzzle14-float-i2f-返回-float-x" class="headerlink" title="puzzle14 float_i2f  返回(float)x"></a>puzzle14 float_i2f  返回(float)x</h3><p>具体过程很麻烦，每步的注释放在代码中</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * float_i2f - Return bit-level equivalent of expression (float) x</span></span><br><span class="line"><span class="comment"> *   Result is returned as unsigned int, but</span></span><br><span class="line"><span class="comment"> *   it is to be interpreted as the bit-level representation of a</span></span><br><span class="line"><span class="comment"> *   single-precision floating point values.</span></span><br><span class="line"><span class="comment"> *   Legal ops: Any integer/unsigned operations incl. ||, &amp;&amp;. also if, while</span></span><br><span class="line"><span class="comment"> *   Max ops: 30</span></span><br><span class="line"><span class="comment"> *   Rating: 4</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="title">float_i2f</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> sign=x&gt;&gt;<span class="number">31</span>&amp;<span class="number">1</span>;<span class="comment">//sign=0,it is positive,else is negtive</span></span><br><span class="line">    <span class="keyword">int</span> i;  <span class="comment">//is the place of the first 1</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">exp</span>;</span><br><span class="line">    <span class="keyword">int</span> f=<span class="number">0</span>;  </span><br><span class="line">    <span class="keyword">int</span> delta;<span class="comment">//偏差（用于舍入）  </span></span><br><span class="line">    <span class="keyword">int</span> frac_mask;<span class="comment">//小数域的掩码（23位）  </span></span><br><span class="line">    <span class="keyword">if</span>(x==<span class="number">0</span>)  </span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//如果为TMin，解释为-（2^31），对应float就是（1）x1.0x2^31</span></span><br><span class="line">        <span class="comment">//所以S=1，M=1，E=31，指数域=31+127=158  </span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(x==<span class="number">0x80000000</span>)</span><br><span class="line">        <span class="built_in">exp</span>=<span class="number">158</span>;  <span class="comment">//E=e-Bias</span></span><br><span class="line">    <span class="keyword">else</span>&#123;  </span><br><span class="line">        <span class="keyword">if</span> (sign)&#123;x = -x;&#125;<span class="comment">//make x become its absolute value</span></span><br><span class="line">        i = <span class="number">31</span>;</span><br><span class="line">        <span class="keyword">while</span> ( !(x &gt;&gt; i) )<span class="comment">//get first num which !=0</span></span><br><span class="line">            i--;</span><br><span class="line">        <span class="built_in">exp</span>= i + <span class="number">127</span>;</span><br><span class="line">        x = x &lt;&lt; (<span class="number">31</span> - i);<span class="comment">//make the first 1 at first</span></span><br><span class="line">        frac_mask = <span class="number">0x7fffff</span>;<span class="comment">//设置23位的小数域掩码  </span></span><br><span class="line">        f= frac_mask &amp; (x &gt;&gt; <span class="number">8</span>);</span><br><span class="line">           <span class="comment">//虽然按照浮点数格式，最前面的9个位不加入小数位，按道理应该右移9位，  </span></span><br><span class="line">          <span class="comment">//但是由于int类型的参数不可能是非规格数，所以最前面的一个有效数据也被舍弃（默认M=1+f），  </span></span><br><span class="line">          <span class="comment">//当向右移动8位，舍弃了有效数据的低8位，再和掩码处理以后，一共舍弃了9位  </span></span><br><span class="line">          <span class="comment">//除了低八位还包括有效数据的最高位，类比二进制小数中小数点左边的那一位数字，</span></span><br><span class="line">          <span class="comment">//在float存储的时候，小数点左边数字不存入内存  </span></span><br><span class="line">          <span class="comment">//这9个位用来存储符号位+指数域  </span></span><br><span class="line">        x = x &amp; <span class="number">0xff</span>;<span class="comment">//由于右移8位，舍弃了有效数据第八位，现在获取低八位用于舍入操作  </span></span><br><span class="line">        delta = x &gt; <span class="number">128</span> || ((x == <span class="number">128</span>) &amp;&amp; (f &amp; <span class="number">1</span>));<span class="comment">//如果低八位超过八位二进制能表示的无符号数的一半，  </span></span><br><span class="line">        <span class="comment">//要在小数域+1，普通的四舍五入思想  </span></span><br><span class="line">          <span class="comment">//如果低八位刚好等于八位二进制能表示的无符号数的一半，而且小数域目前最后一位是1，  </span></span><br><span class="line">          <span class="comment">//根据向偶数舍入的模式，也要在小数域+1，向上舍入的思想，  </span></span><br><span class="line">          <span class="comment">//如果低八位刚好等于八位二进制能表示的无符号数的一半，如果小数域目前最后一位是0，则向下舍入，不加1  </span></span><br><span class="line">          <span class="comment">//如果低八位刚好小于八位二进制能表示的无符号数的一半，直接丢弃，不加1，普通的四舍五入思想  </span></span><br><span class="line">        f+= delta;<span class="comment">//进行舍入  </span></span><br><span class="line">        <span class="keyword">if</span>(f&gt;&gt; <span class="number">23</span>) &#123;<span class="comment">//如果舍入过后，小数域多余23位，则只取低23位，高位舍弃，但是阶码E要加1，</span></span><br><span class="line">                                <span class="comment">//所以指数域也就要加1  </span></span><br><span class="line">            f &amp;= frac_mask;  </span><br><span class="line">            <span class="built_in">exp</span> += <span class="number">1</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> (sign&lt;&lt;<span class="number">31</span>)|(<span class="built_in">exp</span>&lt;&lt;<span class="number">23</span>)|f;<span class="comment">//符号位最高位（31），指数域（30--23），小数域（22-0）  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="puzzle15-float-twice-返回-2-f"><a href="#puzzle15-float-twice-返回-2-f" class="headerlink" title="puzzle15 float_twice 返回 2*f"></a>puzzle15 float_twice 返回 2*f</h3><p>如果是规格化数，把阶码左移一位（这里是概括的说法，不是直接在原来的位串上移），若是非规格化小数,则要做一些特殊处理，若是无穷或NaN，则直接返回相应的数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * float_twice - Return bit-level equivalent of expression 2*f for</span></span><br><span class="line"><span class="comment"> *   floating point argument f.</span></span><br><span class="line"><span class="comment"> *   Both the argument and result are passed as unsigned int's, but</span></span><br><span class="line"><span class="comment"> *   they are to be interpreted as the bit-level representation of</span></span><br><span class="line"><span class="comment"> *   single-precision floating point values.</span></span><br><span class="line"><span class="comment"> *   When argument is NaN, return argument</span></span><br><span class="line"><span class="comment"> *   Legal ops: Any integer/unsigned operations incl. ||, &amp;&amp;. also if, while</span></span><br><span class="line"><span class="comment"> *   Max ops: 30</span></span><br><span class="line"><span class="comment"> *   Rating: 4</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="title">float_twice</span><span class="params">(<span class="keyword">unsigned</span> uf)</span> </span>&#123;<span class="comment">//do not change the first bit</span></span><br><span class="line">  <span class="keyword">unsigned</span> x = uf;  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">unsigned</span> m=x &amp; <span class="number">0x7F800000</span>;<span class="comment">//判断x是否为非规格化数</span></span><br><span class="line">  <span class="keyword">unsigned</span> n=x&amp;<span class="number">0x80000000</span>;</span><br><span class="line">  <span class="keyword">if</span>(m == <span class="number">0</span>)  <span class="comment">//fei gui ge hua,E=2-2^7=-126</span></span><br><span class="line">   x = ((x &amp; <span class="number">0x007FFFFF</span>)&lt;&lt;<span class="number">1</span>) | n;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span>(m != <span class="number">0x7F800000</span>)<span class="comment">//gui ge hua,E=e-127</span></span><br><span class="line">   x = x+<span class="number">0x00800000</span>; <span class="comment">//*2</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最终结果截图"><a href="#最终结果截图" class="headerlink" title="最终结果截图"></a>最终结果截图</h3><p><img src="/images/CSAPPreport_2.png" alt="screenshot"></p>
+<h2 id="datalab实验收获"><a href="#datalab实验收获" class="headerlink" title="datalab实验收获"></a>datalab实验收获</h2><p>很早就听说过这个实验了，第一次一道一道花了两天做了这些题觉得简单的位级运算能做到一些很神奇的事情，也让我对掩码的功能以及二进制补码和浮点数的编码掌握地更深了</p>
+
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#实验内容"><span class="toc-text">实验内容</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle1-bitAnd-用～和-实现-amp"><span class="toc-text">puzzle1 bitAnd 用～和|实现&amp;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle2-getByte-返回int中指定的一个字节"><span class="toc-text">puzzle2 getByte 返回int中指定的一个字节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle3-logicalShift-实现int的逻辑右移"><span class="toc-text">puzzle3 logicalShift 实现int的逻辑右移</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle4-bitCount-计算int位串中1的个数"><span class="toc-text">puzzle4 bitCount 计算int位串中1的个数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle5-bang-不用！实现！的功能"><span class="toc-text">puzzle5 bang 不用！实现！的功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle6-tmin-返回补码表示的最小整数"><span class="toc-text">puzzle6 tmin 返回补码表示的最小整数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle7-fitsBits-判断x是否能用n位表示"><span class="toc-text">puzzle7 fitsBits 判断x是否能用n位表示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle8-divpwr2-计算-x-2-n-向0取整"><span class="toc-text">puzzle8 divpwr2 计算 x/(2^n) 向0取整</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle9-negate-返回一个int的相反数"><span class="toc-text">puzzle9 negate 返回一个int的相反数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle10-isPositive-判断一个int型变量是否为正数"><span class="toc-text">puzzle10 isPositive 判断一个int型变量是否为正数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle11-isLessOrEqual-判断x是否-lt-y-是则返回1-否则返回0"><span class="toc-text">puzzle11 isLessOrEqual 判断x是否&lt;=y 是则返回1 否则返回0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle12-ilog（2）返回以2为底的对数"><span class="toc-text">puzzle12 ilog（2）返回以2为底的对数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle13-float-neg-返回浮点数的相反数"><span class="toc-text">puzzle13 float_neg 返回浮点数的相反数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle14-float-i2f-返回-float-x"><span class="toc-text">puzzle14 float_i2f  返回(float)x</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#puzzle15-float-twice-返回-2-f"><span class="toc-text">puzzle15 float_twice 返回 2*f</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#最终结果截图"><span class="toc-text">最终结果截图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#datalab实验收获"><span class="toc-text">datalab实验收获</span></a></li></ol>
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 江学强</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">http://jxq96.github.io/passages/CSAPP-datalab/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议. 转载请注明出处!
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/Bit-Operation/"><i class="fa fa-tags"></i>Bit-Operation</a>
+    
+    </div>
+  
+</div>
+
+    </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
+    
+    <div class="site-footer-wrapper">
+  <footer class="site-footer">
+    
+    <div class="site-footer-info">
+      <i class="fa fa-clock-o"></i> 本站已稳定运行<span id="site-time"></span>
+    </div>
+    
+      <div class="site-footer-info">
+        <i class="fa fa-paw"></i> 您是本站第 <span id="site-count"></span> 位访客
+      </div>
+    
+    
+      <div class="site-footer-info">
+        <i class="fa fa-at"></i> Email: XueqJiang96@gmail.com
+      </div>
+    
+    <div class="site-footer-info">
+      <i class="fa fa-copyright"></i> 
+      2019 <a href="https://github.com/dongyuanxin/theme-ad/" target="_blank">Theme-AD</a>.
+      Created by <a href="https://jxq96.github.io/" target="_blank">jxq96</a>.
+      All rights reserved.
+    </div>
+  </footer>
+</div>
+    <div id="site-layer" style="display:none;">
+  <div class="site-layer-content">
+    <div class="site-layer-header">
+      <span class="site-layer-header-title" id="site-layer-title"></span>
+      <i class="fa fa-close" id="site-layer-close"></i>
+    </div>
+    <div class="site-layer-body" id="site-layer-container">
+      <div class="site-layer-input" id="site-layer-search" style="display: none;">
+        <div class="site-layer-input-choose">
+          <a href="javascript:void(0);" target="_blank" rel="noopener" title="Change Search Engine">Google</a>
+        </div>
+        <input type="text">
+        <i class="fa fa-search"></i>
+      </div>
+      
+        <div class="site-layer-reward" id="site-layer-reward" style="display: none;">
+          
+            <div>
+              <img src="/images/wechat.png" alt="WeChat">
+              
+                <p>WeChat</p>
+              
+            </div>
+          
+            <div>
+              <img src="/images/alipay.png" alt="AliPay">
+              
+                <p>AliPay</p>
+              
+            </div>
+          
+        </div>
+      
+      <div id="site-layer-welcome" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+    
+
+<div class="bottom-bar">
+  <div class="bottom-bar-left">
+    <a href="/passages/CSAPP-bomblab/" data-enable="true">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <a href="/passages/hello-world/" data-enable="true">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+  </div>
+  <div class="bottom-bar-right">
+    <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="true" id="site-toc-show-btn">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+      <a href="#site-comment" data-enable="true">
+        <i class="fa fa-commenting"></i>
+      </a>
+    
+    <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-toggle-share-btn">
+      <i class="fa fa-share-alt"></i>
+    </a>
+    
+      <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-reward">
+        <i class="fa fa-thumbs-up"></i>
+      </a>
+    
+    <a href="javascript:void(0);" target="_blank" rel="noopener" id="back-top-btn">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+</div>
+    <div id="share-btn">
+  
+    <a id="share-btn-twitter" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-twitter"></i>
+    </a>
+  
+  
+    <a id="share-btn-facebook" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-facebook"></i>
+    </a>
+  
+  
+    <a id="share-btn-weibo" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-weibo"></i>
+    </a>
+  
+  
+    <a id="share-btn-qq" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-qq"></i>
+    </a>
+  
+  
+    <a id="share-btn-wechat" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-wechat"></i>
+    </a>
+  
+</div>
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script async>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '');
+  </script>
+
+
+
+  <script async>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+
+
+
+  <script async>
+    (function(){
+    var src = (document.location.protocol == "http:") ? "http://js.passport.qihucdn.com/11.0.1.js?":"https://jspassport.ssl.qhimg.com/11.0.1.js?";
+    document.write('<script src="' + src + '" id="sozz"><\/script>');
+    })();
+  </script>
+
+
+    
+  </body>
+</html>
