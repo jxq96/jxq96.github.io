@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Jiang Xueqiang" />
+  
+  
+  <title>UNIX网络编程-名称与地址转换 | Blog of jxq96</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="UNIX, Network, DNS," />
+  
+
+  
+  <meta name="description" content="Blog of JiangXueq">
+
+  
+
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js" async></script>
+  
+
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  
+
+  
+    <script src="//unpkg.com/valine/dist/Valine.min.js" async></script>
+  
+
+  
+
+  <script>
+  // theme-ad's config script
+  // it can be used in every script
+  
+  window.AD_CONFIG = {
+    leancloud: {"appid":"QYEL9vtvUpkolt2sURisf6BE-gzGzoHsz","appkey":"46n8F2VkrYQHiS7td97E57CO","comment":true,"count":true},
+    welcome: {"enable":false,"interval":30},
+    start_time: "2019-11-12",
+    passwords: ["57968A7E17D728C1848AE73510CD80D8CF65D91DCB387517803DC2817271230C", ],
+    is_post: true,
+    lock: false,
+    author: "Jiang Xueqiang",
+    share: {"twitter":true,"facebook":true,"weibo":true,"qq":true,"wechat":true},
+    mathjax: true,
+    page_type: "",
+    root: "/"
+  };
+</script>
+
+  <script src="/vendor/sha256.min.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/index.js"></script>
+<script src="/vendor/qrcode.min.js"></script>
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/styles/components/highlight/highlight.css">
+
+  
+</head>
+  <body>
+    <header class="site-header">
+  <div class="site-header-brand">
+    
+      <span class="site-header-brand-title">
+        <a href="/">JXQ96</a>
+      </span>
+    
+    
+      <span class="site-header-brand-motto"> | To Learn, To Write</span>
+    
+  </div>
+  <div class="site-header-right">
+    <nav class="site-header-navigation">
+      
+        <a href="/" target="_self">首页</a>
+      
+        <a href="/archives/" target="_self">归档</a>
+      
+        <a href="/tags/" target="_self">标签</a>
+      
+        <a href="/categories/" target="_self">分类</a>
+      
+        <a href="/friends/" target="_self">友链</a>
+      
+        <a href="/about/" target="_self">关于</a>
+      
+    </nav>
+    <div class="site-header-btn">
+      
+        <a href="https://github.com/jxq96/" target="_blank" id="site-github">
+          <i class="fa fa-github-alt"></i>
+        </a>
+      
+      <!-- <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-search">
+        <i class="fa fa-search"></i>
+      </a>
+      <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-nav-btn">
+        <i class="fa fa-ellipsis-v"></i> -->
+      </a>
+    </div>
+  </div>
+</header>
+<nav class="table-content" id="site-nav">
+  <div class="table-content-title">
+    <span>导航</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc">
+      
+        <li class="toc-item">
+          <a href="/" target="_self">
+            首页
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/archives/" target="_self">
+            归档
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/tags/" target="_self">
+            标签
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/categories/" target="_self">
+            分类
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/friends/" target="_self">
+            友链
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/about/" target="_self">
+            关于
+          </a>
+        </li>
+      
+    </ol>
+  </div>
+</nav>
+<div id="site-process"></div>
+    <main>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2019-11-16
+    </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    UNIX网络编程-名称与地址转换
+  </h1>
+  
+  <article class="passage-article">
+    <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>网络中的主机可以用ip地址来标识和进行网络通信，由于IP地址不好记并且在写的时候容易出错，所以日常使用大多使用字符串形式的域名地址。IP地址和字符串形式的域名有一种对应关系，二者之间需要相互转换。本篇博客介绍UNIX系统中二者之间相互转换的方式。</p>
+<h2 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h2><p>DNS(Domain Name System)是由大量按层次组织的DNS服务器实现的分布式数据库，主要用于主机名和IP地址之间的映射。DNS服务器中通过维护资源记录(Resource Record,RR)来提供相应的映射。常见的RR类型有：</p>
+<ul>
+<li><p>A,A类型的RR将一个主机名映射成一个32位的IPv4地址</p>
+</li>
+<li><p>AAAA(一般称为quad A),quad A类型的RR将一个主机名映射成一个128位的IPv6地址，AAAA这个称号的由来是 $128 = 4\cdot 32$</p>
+</li>
+<li><p>PTR,称为“指针记录”,PTR记录把IP地址映射成主机名</p>
+</li>
+<li><p>MX,MX记录把一个主机指定作为给定主机的邮件交换器。MX可以设置邮件交换器的优先级，值越小优先级越高</p>
+</li>
+<li><p>CNAME, CNAME(canonical name),规范名字，它的常见用法是为常用的服务如(ftp,www)指派CNAME记录。如果人们使用这些服务而不是真实的主机名，那么相应的服务迁移到别的主机用户也不必知道</p>
+</li>
+</ul>
+<h3 id="Aside-DNS替代方法"><a href="#Aside-DNS替代方法" class="headerlink" title="Aside:DNS替代方法"></a>Aside:DNS替代方法</h3><p>不使用DNS也可以获取名字和地址信息，常用方式是静态主机文件，通常是/etc/hosts,通过编写配置文件,应用程序可以通过读取配置文件内的信息来进行名称地址的转换。</p>
+<h2 id="UNIX中名称-地址转换相关的函数"><a href="#UNIX中名称-地址转换相关的函数" class="headerlink" title="UNIX中名称-地址转换相关的函数"></a>UNIX中名称-地址转换相关的函数</h2><h3 id="gethostbyname函数-只能用于IPv4-不可重入"><a href="#gethostbyname函数-只能用于IPv4-不可重入" class="headerlink" title="gethostbyname函数(只能用于IPv4,不可重入)"></a>gethostbyname函数(只能用于IPv4,不可重入)</h3><p>gethostname将hostname转换为IPv4地址的相关信息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="function">struct hostent* <span class="title">gethostbyname</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* hostname)</span></span>;</span><br><span class="line"><span class="comment">// return NULL and set h_errno when fail</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">hostent</span>&#123;</span></span><br><span class="line">    <span class="keyword">char</span>* h_name; <span class="comment">// official(canonical) name of host</span></span><br><span class="line">    <span class="keyword">char</span>** h_aliases; <span class="comment">//pointer to array of pointers to alias names</span></span><br><span class="line">    <span class="keyword">int</span> h_addrtype; <span class="comment">// host address type:eg. AF_INET</span></span><br><span class="line">    <span class="keyword">int</span> h_length; <span class="comment">// length of address:eg.4</span></span><br><span class="line">    <span class="keyword">char</span>** h_addr_list; <span class="comment">//ptr to array of ptrs with IPv4 address</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gethostbyaddr函数-只能用于IPv4，不可重入"><a href="#gethostbyaddr函数-只能用于IPv4，不可重入" class="headerlink" title="gethostbyaddr函数(只能用于IPv4，不可重入)"></a>gethostbyaddr函数(只能用于IPv4，不可重入)</h3><p>gethostbyaddr函数试图将一个二进制的IPv4地址转换成相应的主机名,与gethostbyaddr的行为相反。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="function">struct hostent* <span class="title">gethostbyaddr</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* addr,<span class="keyword">socklen_t</span> len,<span class="keyword">int</span> family)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>addr参数的类型事实不是const char*，而是指向存放IPv4地址的某个in_addr结构的指针，len是这个结构的大小。</p>
+<h3 id="getservbyname和getservbyport函数-均不可重入"><a href="#getservbyname和getservbyport函数-均不可重入" class="headerlink" title="getservbyname和getservbyport函数(均不可重入)"></a>getservbyname和getservbyport函数(均不可重入)</h3><p>像主机一样，服务也可以通过名字来识别。所以在代码中通过名字而不是端口号来指代一个服务，而且名字到端口号的映射关系保存在一个文件中(通常是/etc/services),那么即便是端口号变了只需要修改配置文件而不需要重新修改编译程序。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="function">struct servent* <span class="title">getservbyname</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* servname,<span class="keyword">const</span> <span class="keyword">char</span>* protoname)</span></span>;</span><br><span class="line"><span class="comment">// return NULL if failed</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">servent</span>&#123;</span></span><br><span class="line">    <span class="keyword">char</span>* s_name; <span class="comment">//official service name</span></span><br><span class="line">    <span class="keyword">char</span>** s_aliases; <span class="comment">// alias list</span></span><br><span class="line">    <span class="keyword">int</span> s_port; <span class="comment">// port number,network byte order</span></span><br><span class="line">    <span class="keyword">char</span>* s_proto; <span class="comment">// protocol to use</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数servname必须指定，同时指定protoname时相应的服务必须要有匹配的协议。如果protoname不指定，并且服务有多种协议支持则返回值取决于具体实现。<br>典型调用例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">servent</span>* <span class="title">sptr</span>;</span></span><br><span class="line">sptr = getservbyname(<span class="string">"domain"</span>,<span class="string">"udp"</span>); <span class="comment">// DNS using UDP</span></span><br><span class="line">sptr = getservbyname(<span class="string">"ftp"</span>,<span class="string">"tcp"</span>); <span class="comment">// ftp using tcp,actually only tcp support ftp service</span></span><br></pre></td></tr></table></figure>
+
+<p>getservbyport可以根据端口号和可选的协议查找服务。该函数如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">struct servent* <span class="title">getservbyport</span><span class="params">(<span class="keyword">int</span> port,<span class="keyword">const</span> <span class="keyword">char</span>* protoname)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>注意port必须是网络字节序(网络字节序一般是大端)。<br>典型调用的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">servent</span>* <span class="title">sptr</span>;</span></span><br><span class="line">sptr = getservbyport(htons(<span class="number">53</span>),<span class="string">"UDP"</span>); <span class="comment">// DNS using udp</span></span><br><span class="line">sptr = getservbyport(htons(<span class="number">21</span>),<span class="string">"TCP"</span>); <span class="comment">// FTP using tcp</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="getaddrinfo函数和getnameinfo函数-均可重入"><a href="#getaddrinfo函数和getnameinfo函数-均可重入" class="headerlink" title="getaddrinfo函数和getnameinfo函数(均可重入)"></a>getaddrinfo函数和getnameinfo函数(均可重入)</h3><p>gethostbyname和gethostbyaddr仅支持IPv4。下面介绍同时支持IPv4和IPv6的函数getaddrinfo。<br>函数签名和需要的数据结构如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">addrinfo</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> ai_flags;</span><br><span class="line">    <span class="keyword">int</span> ai_family;</span><br><span class="line">    <span class="keyword">int</span> ai_socktype;</span><br><span class="line">    <span class="keyword">int</span> ai_protocol;</span><br><span class="line">    <span class="keyword">socklen_t</span> ai_addrlen;  <span class="comment">// length of ai_addr</span></span><br><span class="line">    <span class="keyword">char</span>* ai_canonname; <span class="comment">// ptr to canonical name for host</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span>* <span class="title">ai_addr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">addrinfo</span>* <span class="title">ai_next</span>;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getaddrinfo</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* hostname,<span class="keyword">const</span> <span class="keyword">char</span>* service,<span class="keyword">const</span> addrinfo* hints,struct addrinfo** result)</span></span>;</span><br><span class="line"><span class="comment">// return zero if succeed otherwise return non-zero</span></span><br></pre></td></tr></table></figure>
+
+<p>参数的解释如下:</p>
+<ul>
+<li><p>hostname是主机名或者地址串</p>
+</li>
+<li><p>service是服务名或者十进制端口号数串</p>
+</li>
+<li><p>hints可以是空指针(表示返回所有可能的结果)，也可以提供一个hints对返回的结果加以限制,hints中可以设置的成员有</p>
+<ul>
+<li>ai_flags(零个或多个或在一起的AI_XXX值)</li>
+<li>ai_family(某个AF_XXX值)</li>
+<li>ai_socktype(某个SOCK_XXX值)</li>
+<li>ai_protocol(0或者IPPROTO_XXX for IPv4或者IPv6)</li>
+</ul>
+</li>
+<li><p>result是值结果参数,是一个addrinfo的链表头指针</p>
+</li>
+</ul>
+<p>其中ai_flags成员可用的标志和含义如下:</p>
+<ul>
+<li><p>AI_PASSIVE，套接字将用于被动打开(listen)</p>
+</li>
+<li><p>AI_CANONNAME，告知getaddrinfo返回主机的规范名字</p>
+</li>
+<li><p>AI_NUMERICHOST，防止进行任何类型的地址转换，所以要求hostname必须是一个地址串</p>
+</li>
+<li><p>AI_NUMERICSERV，防止进行任何类型的服务到端口转换，所以要求service必须是一个端口号串</p>
+</li>
+<li><p>AI_V4MAPPED，如果同时指定ai_family的值是AF_INET6，那么如果没有可用的AAAA记录，那就返回与A记录对应的IPv4映射的IPv6地址</p>
+</li>
+<li><p>AI_ALL，如果同时指定AI_V4MAPPED，那么除了返回与AAAA记录对应的IPv6地址外，还返回与A记录对应的IPv4映射的IPv6地址</p>
+</li>
+<li><p>AI_ADDRCONFIG，按照主机配置返回地址类型，只查找与所在主机回馈接口之外的网络接口配置的IP地址的版本一致的地址</p>
+</li>
+</ul>
+<p>注意事项：当有多个addrinfo返回时，不能假设TCP服务总是先于UDP服务返回。</p>
+<p>getaddrinfo返回的结果可以直接用于后续的socket调用，利于connect，sentto，listen等。</p>
+<p>getaddrinfo出错会返回非0值，通过下面函数可以根据该返回值得到一个对应的出错信息串。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">gai_strerror</span><span class="params">(<span class="keyword">int</span> errno)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>getaddrinfo返回的结果是动态分配的，所以需要释放，unix提供freeaddrinfo函数释放。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">freeaddrinfo</span><span class="params">(struct addrinfo* ai)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>getnameinfo函数是getaddrinfo函数的互补，以套接字地址为参数，返回描述其中的主机的一个字符串和描述其中的服务的另一个字符串。该函数协议无关的方式提供这些信息，调用者不必关系存放在套接字地址中的具体协议类型。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getnameinfo</span><span class="params">(<span class="keyword">const</span> struct sockaddr* sockaddr,<span class="keyword">socklen_t</span>,addrlen,<span class="keyword">char</span>* host,<span class="keyword">socklen_t</span> hostlen,<span class="keyword">char</span>* serv,<span class="keyword">socklen_t</span> servlen,<span class="keyword">int</span> flags)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>UNIX Network Programming Volume 1, third Edition.</p>
+
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#介绍"><span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DNS"><span class="toc-text">DNS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Aside-DNS替代方法"><span class="toc-text">Aside:DNS替代方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UNIX中名称-地址转换相关的函数"><span class="toc-text">UNIX中名称-地址转换相关的函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gethostbyname函数-只能用于IPv4-不可重入"><span class="toc-text">gethostbyname函数(只能用于IPv4,不可重入)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gethostbyaddr函数-只能用于IPv4，不可重入"><span class="toc-text">gethostbyaddr函数(只能用于IPv4，不可重入)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getservbyname和getservbyport函数-均不可重入"><span class="toc-text">getservbyname和getservbyport函数(均不可重入)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getaddrinfo函数和getnameinfo函数-均可重入"><span class="toc-text">getaddrinfo函数和getnameinfo函数(均可重入)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考文献"><span class="toc-text">参考文献</span></a></li></ol>
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 江学强</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">http://jxq96.github.io/passages/UNIX%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B-%E5%90%8D%E7%A7%B0%E4%B8%8E%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议. 转载请注明出处!
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/UNIX-Network-DNS/"><i class="fa fa-tags"></i>UNIX, Network, DNS</a>
+    
+    </div>
+  
+</div>
+
+    </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
+    
+    <div class="site-footer-wrapper">
+  <footer class="site-footer">
+    
+    <div class="site-footer-info">
+      <i class="fa fa-clock-o"></i> 本站已稳定运行<span id="site-time"></span>
+    </div>
+    
+      <div class="site-footer-info">
+        <i class="fa fa-paw"></i> 您是本站第 <span id="site-count"></span> 位访客
+      </div>
+    
+    
+      <div class="site-footer-info">
+        <i class="fa fa-at"></i> Email: XueqJiang96@gmail.com
+      </div>
+    
+    <div class="site-footer-info">
+      <i class="fa fa-copyright"></i> 
+      2019 <a href="https://github.com/dongyuanxin/theme-ad/" target="_blank">Theme-AD</a>.
+      Created by <a href="https://jxq96.github.io/" target="_blank">jxq96</a>.
+      All rights reserved.
+    </div>
+  </footer>
+</div>
+    <div id="site-layer" style="display:none;">
+  <div class="site-layer-content">
+    <div class="site-layer-header">
+      <span class="site-layer-header-title" id="site-layer-title"></span>
+      <i class="fa fa-close" id="site-layer-close"></i>
+    </div>
+    <div class="site-layer-body" id="site-layer-container">
+      <div class="site-layer-input" id="site-layer-search" style="display: none;">
+        <div class="site-layer-input-choose">
+          <a href="javascript:void(0);" target="_blank" rel="noopener" title="Change Search Engine">Google</a>
+        </div>
+        <input type="text">
+        <i class="fa fa-search"></i>
+      </div>
+      
+        <div class="site-layer-reward" id="site-layer-reward" style="display: none;">
+          
+            <div>
+              <img src="/images/wechat.png" alt="WeChat">
+              
+                <p>WeChat</p>
+              
+            </div>
+          
+            <div>
+              <img src="/images/alipay.png" alt="AliPay">
+              
+                <p>AliPay</p>
+              
+            </div>
+          
+        </div>
+      
+      <div id="site-layer-welcome" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+    
+
+<div class="bottom-bar">
+  <div class="bottom-bar-left">
+    <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="false">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <a href="/passages/CSAPP-bomblab/" data-enable="true">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+  </div>
+  <div class="bottom-bar-right">
+    <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="true" id="site-toc-show-btn">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+      <a href="#site-comment" data-enable="true">
+        <i class="fa fa-commenting"></i>
+      </a>
+    
+    <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-toggle-share-btn">
+      <i class="fa fa-share-alt"></i>
+    </a>
+    
+      <a href="javascript:void(0);" target="_blank" rel="noopener" id="site-reward">
+        <i class="fa fa-thumbs-up"></i>
+      </a>
+    
+    <a href="javascript:void(0);" target="_blank" rel="noopener" id="back-top-btn">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+</div>
+    <div id="share-btn">
+  
+    <a id="share-btn-twitter" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-twitter"></i>
+    </a>
+  
+  
+    <a id="share-btn-facebook" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-facebook"></i>
+    </a>
+  
+  
+    <a id="share-btn-weibo" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-weibo"></i>
+    </a>
+  
+  
+    <a id="share-btn-qq" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-qq"></i>
+    </a>
+  
+  
+    <a id="share-btn-wechat" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-wechat"></i>
+    </a>
+  
+</div>
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script async>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '');
+  </script>
+
+
+
+  <script async>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+
+
+
+  <script async>
+    (function(){
+    var src = (document.location.protocol == "http:") ? "http://js.passport.qihucdn.com/11.0.1.js?":"https://jspassport.ssl.qhimg.com/11.0.1.js?";
+    document.write('<script src="' + src + '" id="sozz"><\/script>');
+    })();
+  </script>
+
+
+    
+  </body>
+</html>
