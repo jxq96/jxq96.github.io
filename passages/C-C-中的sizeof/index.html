@@ -6,12 +6,12 @@
   <meta name="author" content="Jiang Xueqiang" />
   
   
-  <title>归档: 2019/11 | Blog of jxq96</title>
+  <title>C/C++中的sizeof | Blog of jxq96</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="Hexo, Theme-AD" />
+    <meta name="keywords" content="C/C++," />
   
 
   
@@ -42,7 +42,7 @@
     welcome: {"enable":false,"interval":30},
     start_time: "2019-11-12",
     passwords: ["57968A7E17D728C1848AE73510CD80D8CF65D91DCB387517803DC2817271230C", ],
-    is_post: false,
+    is_post: true,
     lock: false,
     author: "Jiang Xueqiang",
     share: {"twitter":true,"facebook":true,"weibo":true,"qq":true,"wechat":true},
@@ -160,43 +160,74 @@
 </nav>
 <div id="site-process"></div>
     <main>
-      <div class="timeline">
-  <h2 class="timeline-title">归档: 5篇</h2>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2019-11-20
+    </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    C/C++中的sizeof
+  </h1>
   
-    
-      <h3 class="timeline-subtitle">2019</h3>
-    
-    <div class="timeline-item">
-      <time>2019-11-20</time>
-      <a target="_self" href="/passages/C-C-%E4%B8%AD%E7%9A%84sizeof/">C/C++中的sizeof</a>
-    </div>
+  <article class="passage-article">
+    <p>##</p>
+<p>写C/C++代码的时候经常会需要用到sizeof运算符，注意，是运算符而不是函数，所以在使用的时候sizeof加不加括号都是一样的。虽然经常用到，但是有时候还是会让人误解，所以我写下这篇博客来当做复习。</p>
+<h3 id="sizeof作用于表达式"><a href="#sizeof作用于表达式" class="headerlink" title="sizeof作用于表达式"></a>sizeof作用于表达式</h3><p>当sizeof作用于基本变量或类型时，返回其大小。当sizeof作用在一个表达式时，结果是这个表达式运算之后的结果，但是注意，sizeof作用的时候并不会求解这个表达式。</p>
+<h3 id="sizeof作用于数组和指针"><a href="#sizeof作用于数组和指针" class="headerlink" title="sizeof作用于数组和指针"></a>sizeof作用于数组和指针</h3><p>sizeof作用于数组可以返回整个数组的大小，但是作用于指针返回指针本身的大小，所以sizeof无法获取动态分配的内存的大小。</p>
+<h3 id="sizeof和strlen"><a href="#sizeof和strlen" class="headerlink" title="sizeof和strlen"></a>sizeof和strlen</h3><p>sizeof和strlen对一个C语言字符串作用会有不同的结果，sizeof会算上末尾的’\0’。</p>
+
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#sizeof作用于表达式"><span class="toc-text">sizeof作用于表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sizeof作用于数组和指针"><span class="toc-text">sizeof作用于数组和指针</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sizeof和strlen"><span class="toc-text">sizeof和strlen</span></a></li></ol>
+  </div>
+</aside>
   
-    
-    <div class="timeline-item">
-      <time>2019-11-16</time>
-      <a target="_self" href="/passages/UNIX%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B-%E5%90%8D%E7%A7%B0%E4%B8%8E%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/">UNIX网络编程-名称与地址转换</a>
-    </div>
+    <aside class="passage-copyright">
+      <div>本文作者: 江学强</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">http://jxq96.github.io/passages/C-C-%E4%B8%AD%E7%9A%84sizeof/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议. 转载请注明出处!
+      </div>
+    </aside>
   
-    
-    <div class="timeline-item">
-      <time>2019-11-15</time>
-      <a target="_self" href="/passages/CSAPP-bomblab/">CSAPP_bomblab</a>
-    </div>
   
+    <div class="passage-tags">
+     
+      <a href="/tags/C-C/"><i class="fa fa-tags"></i>C/C++</a>
     
-    <div class="timeline-item">
-      <time>2019-11-15</time>
-      <a target="_self" href="/passages/CSAPP-datalab/">CSAPP_datalab</a>
-    </div>
-  
-    
-    <div class="timeline-item">
-      <time>2019-11-12</time>
-      <a target="_self" href="/passages/hello-world/">Hello World</a>
     </div>
   
 </div>
+
     </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
     
     <div class="site-footer-wrapper">
   <footer class="site-footer">
@@ -266,16 +297,16 @@
     <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="false">
       <i class="fa fa-arrow-left"></i>
     </a>
-    <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="false">
+    <a href="/passages/UNIX%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B-%E5%90%8D%E7%A7%B0%E4%B8%8E%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/" data-enable="true">
       <i class="fa fa-arrow-right"></i>
     </a>
   </div>
   <div class="bottom-bar-right">
-    <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="false" id="site-toc-show-btn">
+    <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="true" id="site-toc-show-btn">
       <i class="fa fa-bars"></i>
     </a>
     
-      <a href="javascript:void(0);" target="_blank" rel="noopener" data-enable="false">
+      <a href="#site-comment" data-enable="true">
         <i class="fa fa-commenting"></i>
       </a>
     
