@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Xueqiang Jiang" />
+  
+  
+  <title>Linux Kernel Development(1) —— 进程管理 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Linux,Linux,进程," />
+  
+
+  
+  <meta name="description" content="江学强的小站">
+
+  
+
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js" async></script>
+  
+
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  
+
+  
+    <script src="//unpkg.com/valine/dist/Valine.min.js" async></script>
+  
+
+  
+
+  <script>
+  // theme-ad's config script
+  // it can be used in every script
+  
+  window.AD_CONFIG = {
+    leancloud: {"appid":"hHqznDYG2oqFS9DFMx9WvK6O-9Nh9j0Va","appkey":"0Ncb7wYk7mRyoHueIVffSnXb","comment":true,"count":true},
+    welcome: {"enable":false,"interval":30},
+    start_time: "2021-05-05",
+    passwords: ["57968a7e17d728c1848ae73510cd80d8cf65d91dcb387517803dc2817271230c", ],
+    is_post: true,
+    lock: false,
+    author: "Xueqiang Jiang",
+    share: {"twitter":true,"facebook":true,"weibo":false,"qq":true,"wechat":true},
+    mathjax: true,
+    page_type: "",
+    root: "/"
+  };
+</script>
+
+  
+<script src="/vendor/sha256.min.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/index.js"></script>
+<script src="/vendor/qrcode.min.js"></script>
+
+
+  
+    <link rel="icon" href="/images/touxiang.ico">
+    <link rel="apple-touch-icon" href="/images/touxiang.png">
+  
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/index.css">
+<link rel="stylesheet" href="/styles/components/highlight/highlight.css">
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+  <body>
+    <header class="site-header">
+  <div class="site-header-brand">
+    
+      <span class="site-header-brand-title">
+        <a href="/">JXQ96</a>
+      </span>
+    
+    
+      <span class="site-header-brand-motto"> | Don Quixote Never Dies</span>
+    
+  </div>
+  <div class="site-header-right">
+    <nav class="site-header-navigation">
+      
+        <a href="/" target="_self">首页</a>
+      
+        <a href="/archives/" target="_self">归档</a>
+      
+        <a href="/tags/" target="_self">标签</a>
+      
+        <a href="/categories/" target="_self">分类</a>
+      
+        <a href="/friends/" target="_self">友链</a>
+      
+        <a href="/about/" target="_self">关于</a>
+      
+    </nav>
+    <div class="site-header-btn">
+      
+        <a href="https://github.com/jxq96/" target="_blank" id="site-github">
+          <i class="fa fa-github-alt"></i>
+        </a>
+      
+      <a href="javascript:void(0);" id="site-search">
+        <i class="fa fa-search"></i>
+      </a>
+      <a href="javascript:void(0);" id="site-nav-btn">
+        <i class="fa fa-ellipsis-v"></i>
+      </a>
+    </div>
+  </div>
+</header>
+<nav class="table-content" id="site-nav">
+  <div class="table-content-title">
+    <span>导航</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc">
+      
+        <li class="toc-item">
+          <a href="/" target="_self">
+            首页
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/archives/" target="_self">
+            归档
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/tags/" target="_self">
+            标签
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/categories/" target="_self">
+            分类
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/friends/" target="_self">
+            友链
+          </a>
+        </li>
+      
+        <li class="toc-item">
+          <a href="/about/" target="_self">
+            关于
+          </a>
+        </li>
+      
+    </ol>
+  </div>
+</nav>
+<div id="site-process"></div>
+    <main>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2021-05-06
+    </span>
+    
+      <span>
+        | <a href="/categories/Linux/"><i class="fa fa-bookmark"></i>Linux</a>
+      </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    Linux Kernel Development(1) —— 进程管理
+  </h1>
+  
+  <article class="passage-article">
+    <p>进程以及对进程的管理是操作系统最重要的部分之一，主要是对CPU资源进行抽象，本篇博客主要叙述Linux内核对于进程以及线程管理的部分。</p>
+<!-- -->
+
+<h2 id="Process-descripor-and-task-struct"><a href="#Process-descripor-and-task-struct" class="headerlink" title="Process descripor and task_struct"></a>Process descripor and task_struct</h2><p>Linux kernel用一个环形的双向链表（task list）来维护每个process的内核结构， 每个process用task_struct结构体描述， task_struct结构体很大，因为一个进程的几乎所有的信息都会维护在这个结构体中（超过1K）。</p>
+<p>对于每个进入内核态的进程来说怎么快速拿到对应的task_struct呢？遍历task list显然不现实，Linux的实现是在内核栈（kernel stack，每个进程都有，固定大小，一般是8K）的栈底存一个 thread_info结构，这个结构很小，其中存了对应的task_struct的指针，所以只需要两条指令就能拿到对应的task_struct，不用遍历链表。</p>
+<p><img src="kernel_stack.png"></p>
+<p>每个process都有一个pid，但是pid的大小有限（循环使用，可以通过/proc/sys/kernel/pid_max来设置最大值)</p>
+<h2 id="Process-State"><a href="#Process-State" class="headerlink" title="Process State"></a>Process State</h2><ul>
+<li>TASK_RUNNING: 进程要么正在运行，要么ready to run（在run queue中）</li>
+<li>TASK_INTERRUTIBLE: 进程sleeping（或者说blocked），等待某个条件成立之后被唤醒，唤醒之后到TASK_RUNNING状态， 该状态下的进程收到signal也会被唤醒</li>
+<li>TASK_UNITERRUPTIBLE: 与TASK_INTERRUPTIBLE的区别是收到信号或者中断也不会被唤醒，一定要等到某个条件成立</li>
+<li>__TASK_TRACED: 进程正在被trace，例如处于debug状态，通过ptrace的方式</li>
+<li>__TASK_STOPPED:</li>
+</ul>
+<p><img src="process_states.png"></p>
+<p>操作当前process的状态可以通过接口set_task_state(task,state)来处理， 在多处理器下，这个函数里面会有一个memory barrier</p>
+<h2 id="Process-Family-Tree"><a href="#Process-Family-Tree" class="headerlink" title="Process Family Tree"></a>Process Family Tree</h2><p>操作当前process的状态可以通过接口  set_task_state(task,state)来处理， 在多处理器下，这个函数里面会有一个memory barrier</p>
+<h2 id="Process-Creation"><a href="#Process-Creation" class="headerlink" title="Process Creation"></a>Process Creation</h2><p>非常熟悉的fork系统调用以及COW优化， fork本身的语义这里略过</p>
+<p>fork和vfork最终都是通过clone系统调用来实现，只是掉的时候给不同的flag参数</p>
+<p>看fork的话，调用链是: fork → clone → do_fork → copy_process</p>
+<p>copy_process的流程如下：<br><img src="fork_process.png"></p>
+<p>vfork和fork的区别： </p>
+<p>vfork基于这样的观察，经常出现的情况是fork之后紧接着exec，这样在fork的时候拷贝页表其实没有必要，所以vfork不拷贝父进程的页表，而是共享页表， vfork结束之后一定返回子进程，并且父进程一直被阻塞直到子进程结束运行或者调用exec</p>
+<p>同样基于上面的观察，Linux的fork实现其实是先调度子进程，如果子进程立刻调用exec就可以省去很多COW带来的write page fault的开销</p>
+<h2 id="Linux中的线程"><a href="#Linux中的线程" class="headerlink" title="Linux中的线程"></a>Linux中的线程</h2><p>Linux内核对于线程其实没有做区别，同样用task_struct来描述一个线程，跟普通的进程类似，也即Linux在调度的时候是调度一个由task_struct描述的task，而不管其实是进程还是线程（windows和sun Solaris都是做了明确的区分的）</p>
+<p>Linux这样做的坏处是每个线程太重了，因为一个task_struct很大</p>
+<p>好处是可以快速拿到对应进程的所有信息，因为同一个进程的thread有<strong>几乎</strong>同样的task_struct</p>
+<p>线程的创建也是通过clone来实现，只是给了不同的flag。这些flag如下表格：</p>
+<p><img src="clone_flag.png"></p>
+<p>fork = clone(SIGCHLD, 0)</p>
+<p>vfork = clone(CLONE_VFORK|CLONE_VM|SIGCHLD,0), 可以看到vfork不会和父进程共享open file</p>
+<p>create_thread = clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHADN, 0)</p>
+<p>上面线程创建的flag可以看出来，同一个进程的线程之间共享vm space, open files，file system info, signal handlers</p>
+<h3 id="内核线程"><a href="#内核线程" class="headerlink" title="内核线程"></a>内核线程</h3><p>内核线程是只跑在内核态的线程，与普通线程的区别是内核线程没有 address space，换句话说没有页表，对应的mm指针是NULL</p>
+<p>内核线程有对应的 kthread_create, kthread_run, kthread_stop函数</p>
+<h3 id="进程结束"><a href="#进程结束" class="headerlink" title="进程结束"></a>进程结束</h3><p>一个进程结束可以是main函数跑完了，或者调了exit（收到一些信号的默认行为是调exit），之后都会调do_exit。</p>
+<p>do_exit做下面几件事</p>
+<ul>
+<li>设置task_struct中的flags中的 PF_EXITING位</li>
+<li>调用 del_timer_sync,来去除后续的timer</li>
+<li>调exit_mm， 如果没有其他进程在用这个地址空间，就释放，否走降低ref count？</li>
+<li>调exit_files和exit_fs， decrement the usage count of related file，如果到0，就销毁</li>
+<li>在task_struct中设置exit_code, 父进程可能会用这个信息</li>
+<li>调exit_notify, 向父进程发信号（后面讲父进程先退出怎么办，其实上步已经讲过了，reparent），并且把当前进程的所有子进程都reparent，给当前线程组的其他进程或者init进程，设置状态为EXIT_ZOMBIE</li>
+<li>调schedule</li>
+</ul>
+<p>可以看到<strong>do_exit并没有把对应的task_struct销毁</strong>，此时一般被叫做僵尸进程，父进程获取到需要的信息（通过wait之类的调用）之后或者parent主动向内核发信号表示不care子进程退出之后的状态内核才会删除对应的task_struct</p>
+
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Process-descripor-and-task-struct"><span class="toc-text">Process descripor and task_struct</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Process-State"><span class="toc-text">Process State</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Process-Family-Tree"><span class="toc-text">Process Family Tree</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Process-Creation"><span class="toc-text">Process Creation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B"><span class="toc-text">Linux中的线程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B"><span class="toc-text">内核线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%BB%93%E6%9D%9F"><span class="toc-text">进程结束</span></a></li></ol></li></ol>
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 江学强</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">http://example.com/passages/2021-05-06-proocess/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议. 转载请注明出处!
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/Linux/"><i class="fa fa-tags"></i>Linux</a>
+     
+      <a href="/tags/%E8%BF%9B%E7%A8%8B/"><i class="fa fa-tags"></i>进程</a>
+    
+    </div>
+  
+</div>
+
+    </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
+    
+    <div class="site-footer-wrapper">
+  <footer class="site-footer">
+    
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">开源项目推荐</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://penglai-enclave.systems/" target="_blank">Penglai Enclave</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">系统相关课程</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://pdos.csail.mit.edu/6.828/" target="_blank">MIT操作系统</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://ipads.se.sjtu.edu.cn/courses/os/schedule.shtml" target="_blank">IPADS操作系统</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://pdos.csail.mit.edu/6.824/" target="_blank">MIT分布式系统</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://css.csail.mit.edu/6.858/" target="_blank">MIT系统安全</a>
+            </span>
+          
+            <span class="site-footer-item">
+              <a href="https://15721.courses.cs.cmu.edu/" target="_blank">CMU数据库</a>
+            </span>
+          
+        </div>
+      
+        <div class="site-footer-col">
+          <h5 class="site-footer-title">Catch Me</h5>
+          
+            <span class="site-footer-item">
+              <a href="https://github.com/jxq96" target="_blank">Github</a>
+            </span>
+          
+        </div>
+      
+    
+    <div class="site-footer-info">
+      <i class="fa fa-clock-o"></i> 本站已稳定运行<span id="site-time"></span>
+    </div>
+    
+      <div class="site-footer-info">
+        <i class="fa fa-paw"></i> 您是本站第 <span id="site-count"></span> 位访客
+      </div>
+    
+    
+      <div class="site-footer-info">
+        <i class="fa fa-at"></i> Email: xueqjiang@gmail.com
+      </div>
+    
+    <div class="site-footer-info">
+      <i class="fa fa-copyright"></i> 
+      2019 <a href="https://github.com/dongyuanxin/theme-ad/" target="_blank">Theme-AD</a>.
+      Created by <a href="https://jxq96.com/" target="_blank">jxq96</a>.
+      All rights reserved.
+    </div>
+  </footer>
+</div>
+    <div id="site-layer" style="display:none;">
+  <div class="site-layer-content">
+    <div class="site-layer-header">
+      <span class="site-layer-header-title" id="site-layer-title"></span>
+      <i class="fa fa-close" id="site-layer-close"></i>
+    </div>
+    <div class="site-layer-body" id="site-layer-container">
+      <div class="site-layer-input" id="site-layer-search" style="display: none;">
+        <div class="site-layer-input-choose">
+          <a href="javascript:void(0);" title="Change Search Engine">Google</a>
+        </div>
+        <input type="text">
+        <i class="fa fa-search"></i>
+      </div>
+      
+        <div class="site-layer-reward" id="site-layer-reward" style="display: none;">
+          
+            <div>
+              <img src="/images/wechat.jpg" alt="WeChat">
+              
+                <p>WeChat</p>
+              
+            </div>
+          
+            <div>
+              <img src="/images/alipay.jpg" alt="AliPay">
+              
+                <p>AliPay</p>
+              
+            </div>
+          
+        </div>
+      
+      <div id="site-layer-welcome" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+    
+
+<div class="bottom-bar">
+  <div class="bottom-bar-left">
+    <a href="/passages/hello-world/" data-enable="true">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <a href="javascript:void(0);" data-enable="false">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+  </div>
+  <div class="bottom-bar-right">
+    <a href="javascript:void(0);" data-enable="true" id="site-toc-show-btn">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+      <a href="#site-comment" data-enable="true">
+        <i class="fa fa-commenting"></i>
+      </a>
+    
+    <a href="javascript:void(0);" id="site-toggle-share-btn">
+      <i class="fa fa-share-alt"></i>
+    </a>
+    
+      <a href="javascript:void(0);" id="site-reward">
+        <i class="fa fa-thumbs-up"></i>
+      </a>
+    
+    <a href="javascript:void(0);" id="back-top-btn">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+</div>
+    <div id="share-btn">
+  
+    <a id="share-btn-twitter" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-twitter"></i>
+    </a>
+  
+  
+    <a id="share-btn-facebook" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-facebook"></i>
+    </a>
+  
+  
+  
+    <a id="share-btn-qq" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-qq"></i>
+    </a>
+  
+  
+    <a id="share-btn-wechat" href="javascript:void(0);" target="_blank">
+      <i class="fa fa-wechat"></i>
+    </a>
+  
+</div>
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script async>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '');
+  </script>
+
+
+
+  <script async>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+
+
+
+  <script async>
+    (function(){
+    var src = (document.location.protocol == "http:") ? "http://js.passport.qihucdn.com/11.0.1.js?":"https://jspassport.ssl.qhimg.com/11.0.1.js?";
+    document.write('<script src="' + src + '" id="sozz"><\/script>');
+    })();
+  </script>
+
+
+    
+  </body>
+</html>
