@@ -188,10 +188,9 @@
   <article class="passage-article">
     <p>进程以及对进程的管理是操作系统最重要的部分之一，主要是对CPU资源进行抽象，本篇博客主要叙述Linux内核对于进程以及线程管理的部分。</p>
 <!-- -->
-
 <h2 id="Process-descripor-and-task-struct"><a href="#Process-descripor-and-task-struct" class="headerlink" title="Process descripor and task_struct"></a>Process descripor and task_struct</h2><p>Linux kernel用一个环形的双向链表（task list）来维护每个process的内核结构， 每个process用task_struct结构体描述， task_struct结构体很大，因为一个进程的几乎所有的信息都会维护在这个结构体中（超过1K）。</p>
 <p>对于每个进入内核态的进程来说怎么快速拿到对应的task_struct呢？遍历task list显然不现实，Linux的实现是在内核栈（kernel stack，每个进程都有，固定大小，一般是8K）的栈底存一个 thread_info结构，这个结构很小，其中存了对应的task_struct的指针，所以只需要两条指令就能拿到对应的task_struct，不用遍历链表。</p>
-<p><img src="kernel_stack.png"></p>
+<p><img src="kernel_stack.png" alt=""></p>
 <p>每个process都有一个pid，但是pid的大小有限（循环使用，可以通过/proc/sys/kernel/pid_max来设置最大值)</p>
 <h2 id="Process-State"><a href="#Process-State" class="headerlink" title="Process State"></a>Process State</h2><ul>
 <li>TASK_RUNNING: 进程要么正在运行，要么ready to run（在run queue中）</li>
@@ -200,13 +199,13 @@
 <li>__TASK_TRACED: 进程正在被trace，例如处于debug状态，通过ptrace的方式</li>
 <li>__TASK_STOPPED:</li>
 </ul>
-<p><img src="process_states.png"></p>
+<p><img src="process_states.png" alt=""></p>
 <p>操作当前process的状态可以通过接口set_task_state(task,state)来处理， 在多处理器下，这个函数里面会有一个memory barrier</p>
 <h2 id="Process-Family-Tree"><a href="#Process-Family-Tree" class="headerlink" title="Process Family Tree"></a>Process Family Tree</h2><p>操作当前process的状态可以通过接口  set_task_state(task,state)来处理， 在多处理器下，这个函数里面会有一个memory barrier</p>
 <h2 id="Process-Creation"><a href="#Process-Creation" class="headerlink" title="Process Creation"></a>Process Creation</h2><p>非常熟悉的fork系统调用以及COW优化， fork本身的语义这里略过</p>
 <p>fork和vfork最终都是通过clone系统调用来实现，只是掉的时候给不同的flag参数</p>
 <p>看fork的话，调用链是: fork → clone → do_fork → copy_process</p>
-<p>copy_process的流程如下：<br><img src="fork_process.png"></p>
+<p>copy_process的流程如下：<br><img src="fork_process.png" alt=""></p>
 <p>vfork和fork的区别： </p>
 <p>vfork基于这样的观察，经常出现的情况是fork之后紧接着exec，这样在fork的时候拷贝页表其实没有必要，所以vfork不拷贝父进程的页表，而是共享页表， vfork结束之后一定返回子进程，并且父进程一直被阻塞直到子进程结束运行或者调用exec</p>
 <p>同样基于上面的观察，Linux的fork实现其实是先调度子进程，如果子进程立刻调用exec就可以省去很多COW带来的write page fault的开销</p>
@@ -214,7 +213,7 @@
 <p>Linux这样做的坏处是每个线程太重了，因为一个task_struct很大</p>
 <p>好处是可以快速拿到对应进程的所有信息，因为同一个进程的thread有<strong>几乎</strong>同样的task_struct</p>
 <p>线程的创建也是通过clone来实现，只是给了不同的flag。这些flag如下表格：</p>
-<p><img src="clone_flag.png"></p>
+<p><img src="clone_flag.png" alt=""></p>
 <p>fork = clone(SIGCHLD, 0)</p>
 <p>vfork = clone(CLONE_VFORK|CLONE_VM|SIGCHLD,0), 可以看到vfork不会和父进程共享open file</p>
 <p>create_thread = clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHADN, 0)</p>

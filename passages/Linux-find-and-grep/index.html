@@ -193,7 +193,6 @@
 <h2 id="find的使用"><a href="#find的使用" class="headerlink" title="find的使用"></a>find的使用</h2><p>一句话介绍find的功能：在指定目录下查找符合某些特征的文件，这些特征可以是文件名、文件的创建修改时间、文件的类型、文件的大小等等。</p>
 <p>find命令的结构</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find [-H] [-L] [-P] [-D debugoption] [-Olevel] [starting-point...] [expression]</span><br></pre></td></tr></table></figure>
-
 <p>其中-H, -L, -P都是对目录下遇到符号链接（Symbolic Link）时怎么处理，不需要记住，用到的时候直接看一下manpage，这里只需要记住，find在指定的目录下搜索是递归操作，这几个命令是规定遇到符号链接的目录需不需要在该目录下进行递归查找。</p>
 <p>-D选项和-O选项是字面意思，一个是提供打印调试信息等级的选项，一个是类似与编译优化选项（从0到3）</p>
 <p>staring-point是搜索开始的路径名；</p>
@@ -216,22 +215,20 @@
 <li>根据大小， -size n</li>
 <li>根据所有者， -user name</li>
 </ul>
-<p>condition之间还可以有逻辑操作 -and -or -not （）例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find .  -type f -and -perm 600</span><br></pre></td></tr></table></figure>
-<p>作用查找当前目录下所有权限为600的普通文件。</p>
+<p>condition之间还可以有逻辑操作 -and -or -not （）例如：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find .  -type f -and -perm 600</span><br></pre></td></tr></table></figure><br>作用查找当前目录下所有权限为600的普通文件。</p>
 <p>find预定义了一些常见的action， -delete，-print， -quit，-ls，其中默认是print<br>也可以自定义自己的action，用法是 -exec command {} ;</p>
 <h2 id="grep的使用"><a href="#grep的使用" class="headerlink" title="grep的使用"></a>grep的使用</h2><p>grep就是使用正则表达式在文本中匹配文件，事实上find的部分功能也可以用grep配合ls来实现，例如 ls . | grep *zip可以打印出当前目录下所有以zip结尾的文件。</p>
 <p>grep的命令格式</p>
 <p>grep [options] regular-expression [file…]</p>
 <p>其中options理解为在做正则表达式匹配的时候的一些选项，常见的选项有</p>
 <ul>
-<li>i， 忽略大小写，相当于 –ignore-case</li>
-<li>v， 反向匹配，相当于–invert-match</li>
-<li>c,  打印出匹配数，相当于–count</li>
-<li>l,  打印匹配到的文件名，而不只是匹配到的那一行，相当于 –file-with-matches</li>
-<li>L, 和-l类似，不过只打印文件名，相当于 –file-without-matches</li>
-<li>n，同时打印出匹配的行号，相当于 –line-number</li>
-<li>h, 对于多文件搜索来说，不打印文件名，相当于 –no-filename</li>
+<li>i， 忽略大小写，相当于 —ignore-case</li>
+<li>v， 反向匹配，相当于—invert-match</li>
+<li>c,  打印出匹配数，相当于—count</li>
+<li>l,  打印匹配到的文件名，而不只是匹配到的那一行，相当于 —file-with-matches</li>
+<li>L, 和-l类似，不过只打印文件名，相当于 —file-without-matches</li>
+<li>n，同时打印出匹配的行号，相当于 —line-number</li>
+<li>h, 对于多文件搜索来说，不打印文件名，相当于 —no-filename</li>
 </ul>
 <p>正则表达式就是Linux下面正则表达式，不赘述。</p>
 
