@@ -6,12 +6,12 @@
   <meta name="author" content="Xueqiang Jiang" />
   
   
-  <title>归档: 2021/5 | Hexo</title>
+  <title>leetcode813-最大平均值和的分组 | Hexo</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="Hexo, Theme-AD" />
+    <meta name="keywords" content="algorithm,leecode,algorithm," />
   
 
   
@@ -42,7 +42,7 @@
     welcome: {"enable":false,"interval":30},
     start_time: "2021-05-05",
     passwords: ["57968a7e17d728c1848ae73510cd80d8cf65d91dcb387517803dc2817271230c", ],
-    is_post: false,
+    is_post: true,
     lock: false,
     author: "Xueqiang Jiang",
     share: {"twitter":true,"facebook":true,"weibo":false,"qq":true,"wechat":true},
@@ -168,19 +168,94 @@
 </nav>
 <div id="site-process"></div>
     <main>
-      <div class="timeline">
-  <h2 class="timeline-title">归档: 4篇</h2>
+      
+  <div class="passage">
+  <div class="passage-meta">
+    <span>
+      <i class="fa fa-calendar"></i>2022-12-01
+    </span>
+    
+      <span>
+        | <a href="/categories/algorithm/"><i class="fa fa-bookmark"></i>algorithm</a>
+      </span>
+    
+    
+      <span>
+        | <i class="fa fa-unlock-alt"></i>UNLOCK
+      </span>
+    
+  </div>
+  <h1 class="passage-title">
+    leetcode813-最大平均值和的分组
+  </h1>
   
+  <article class="passage-article">
+    <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><blockquote>
+<p>给定数组nums和整数k，将给定的数组nums分成最多k个相邻的非空子数组。分数由每个子数组平均值的总和构成。返回最大分数，答案误差在$10^{-6}$以内可接受。<br>其中1 &lt;&#x3D; nums.length &lt;&#x3D; 100, 1 &lt;&#x3D;k &lt;&#x3D; nums.length</p>
+</blockquote>
+<h2 id="解法：动态规划"><a href="#解法：动态规划" class="headerlink" title="解法：动态规划"></a>解法：动态规划</h2><p>首先，比较容易看出来分成k组是最大的，证明比较简单，但是考虑极端情况，每个元素单独分组最后的结果是整个数组的和，显然是最大的。</p>
+<p>严格的证明如下：</p>
+<p>假设最优的是分为m组，其中m小于k,由于 k &lt;&#x3D; nums.length</p>
+<p>显然存在某个分组至少存在2个元素，设该分组元素为n个，分别为$a_1,\cdots , a_n$,则将其分组分为$a_1,\cdots , a_{n-1}$和$a_n$，<br>则拆分后的均值和为 $a_n + \frac{\sum_{i&#x3D;1}^{n-1}a_i}{n-1}\gt\frac{a_n}{n}+\frac{\sum_{i&#x3D;1}^{n-1}a_i}{n} &#x3D; \frac{\sum_{i&#x3D;1}^{n}a_i}{n}&#x3D;$拆分前的均值</p>
+<p>根据上面的证明只需要考虑数组分成k个相邻不空的子数组的最大均值和，显然搜索空间是指数级的$\tbinom{n-1}{k-1}$。</p>
+<p>这种类型题目很自然想到需要用到前缀和用来快速获取区间的和，设前缀和为prefix，使用动态规划数组dp</p>
+<blockquote>
+<p>dp[i][j]定义为nums区间[0,i-1]划分为j个子数组的最大平均值和，则显然有$i\ge j$ </p>
+</blockquote>
+<p>当j&#x3D;1时，dp[i][j]就是区间的平均值</p>
+<p>当j&gt;1时，可以将区间[0,i-1]划分成[0, m-1],[m,i-1]两个部分，dp[i][j]就是所有合法划分方式的最大值</p>
+<p>所以转移方程为</p>
+<p>$$dp[i][j]&#x3D;\begin{cases}\frac{\sum_{r&#x3D;0}^{i-1}Num[r]}{i},&amp;\text{如果} j &#x3D; 1  \\<br>\mathop{max}\limits_{m\ge j-1}{dp[m][j-1] + \frac{\sum_{r&#x3D;m}^{i-1}Num[r]}{i-m}},&amp;\text{如果} j \gt 1<br>\end{cases}$$</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">double</span> <span class="title">solution::largestSumOfAverage</span><span class="params">(vector&lt;<span class="type">int</span>&gt; &amp;nums, <span class="type">int</span> k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">size_t</span> sz = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="function">vector&lt;<span class="type">double</span>&gt; <span class="title">prefix</span><span class="params">(sz+<span class="number">1</span>, <span class="number">0</span>)</span></span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; sz; ++i)&#123;</span><br><span class="line">        prefix[i+<span class="number">1</span>] = prefix[i] + nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">double</span>&gt;&gt; <span class="built_in">dp</span>(sz+<span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="type">double</span>&gt;(k+<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">size_t</span> i = <span class="number">1</span>; i &lt;= sz; ++i)&#123;</span><br><span class="line">        dp[i][<span class="number">1</span>] = prefix[i]/i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">2</span>; j &lt;= k; ++j)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = j; i&lt;= sz; ++i)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> m = j - <span class="number">1</span>; m &lt; i; ++m)&#123;</span><br><span class="line">                dp[i][j] = <span class="built_in">max</span>(dp[i][j], dp[m][j<span class="number">-1</span>]+(prefix[i]-prefix[m])/(i-m));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[sz][k];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+  </article>
+  <aside class="table-content" id="site-toc">
+  <div class="table-content-title">
+    <i class="fa fa-arrow-right fa-lg" id="site-toc-hide-btn"></i>
+    <span>目录</span>
+  </div>
+  <div class="table-content-main">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92"><span class="toc-text">解法：动态规划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-text">代码</span></a></li></ol>
+  </div>
+</aside>
+  
+    <aside class="passage-copyright">
+      <div>本文作者: 江学强</div>
+      
+        <div>
+          原文链接: 
+          <a href="" target="_blank">http://jxq96.top/passages/leetcode813-%E6%9C%80%E5%A4%A7%E5%B9%B3%E5%9D%87%E5%80%BC%E5%92%8C%E7%9A%84%E5%88%86%E7%BB%84/</a>
+        </div>
+      
+      <div>
+        版权声明: 本博客所有文章除特别声明外, 均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议. 转载请注明出处!
+      </div>
+    </aside>
+  
+  
+    <div class="passage-tags">
+     
+      <a href="/tags/leecode/"><i class="fa fa-tags"></i>leecode</a>
+     
+      <a href="/tags/algorithm/"><i class="fa fa-tags"></i>algorithm</a>
     
-      <h3 class="timeline-subtitle">2021</h3>
-    
-    <div class="timeline-item">
-      <time>2021-05-06</time>
-      <a target="_self" href="/passages/2021-05-06-proocess/">Linux Kernel Development(1) —— 进程管理</a>
     </div>
   
 </div>
+
     </main>
+    
+      
+<div class="site-comment-contanier" data-plateform="leancloud">
+  
+    <p id="site-comment-info">
+      <i class="fa fa-spinner fa-spin"></i> 评论加载中
+    </p>
+    <div id="site-comment"></div>
+  
+</div>
     
     <div class="site-footer-wrapper">
   <footer class="site-footer">
@@ -299,16 +374,16 @@
     <a href="javascript:void(0);" data-enable="false">
       <i class="fa fa-arrow-left"></i>
     </a>
-    <a href="javascript:void(0);" data-enable="false">
+    <a href="/passages/%E5%B8%B8%E8%A7%81%E6%B1%82%E5%92%8C%E5%92%8C%E7%BA%A7%E6%95%B0/" data-enable="true">
       <i class="fa fa-arrow-right"></i>
     </a>
   </div>
   <div class="bottom-bar-right">
-    <a href="javascript:void(0);" data-enable="false" id="site-toc-show-btn">
+    <a href="javascript:void(0);" data-enable="true" id="site-toc-show-btn">
       <i class="fa fa-bars"></i>
     </a>
     
-      <a href="javascript:void(0);" data-enable="false">
+      <a href="#site-comment" data-enable="true">
         <i class="fa fa-commenting"></i>
       </a>
     
